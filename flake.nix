@@ -1,5 +1,5 @@
 {
-  description = "Development shell for catris";
+  description = "Development shell for catris client";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     poetry2nix.url = "github:nix-community/poetry2nix";
@@ -14,7 +14,7 @@
         }; 
       };
       inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryApplication;
-      catris = mkPoetryApplication { 
+      catrisClient = mkPoetryApplication { 
         projectDir = ./.;
         python = pkgs.python3;
         pyproject = ./pyproject.toml;
@@ -24,7 +24,7 @@
       devShells.x86_64-linux.default = pkgs.mkShell {
         LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
         buildInputs = with pkgs; [
-          catris
+          catrisClient
         ];    
       };
   };
