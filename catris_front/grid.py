@@ -13,11 +13,24 @@ class Grid:
         self._size_x = size_x
         self._cells = [[0] * size_x for _ in range(size_y)]
         self._piece_provider = piece_provider
-        self._piece = piece_provider()
-        # TODO: Fix spawning not being centered and clipping out of the grid.
-        self._piece.spawn(0, size_x // 2)
+        self.__spawn_piece()
 
-    
+
+    def __spawn_piece(self):
+        self._piece = self._piece_provider()
+        
+        center_x = 0
+        xs = []
+        for _, x in self._piece.get_blocks_coords():
+            if x not in xs:
+                xs.append(x)
+            
+        xs.sort()
+        xs_len = len(xs)
+        center_x = xs[xs_len // 2] + xs_len % 2
+        self._piece.spawn(0, self._size_x // 2 - center_x)
+
+
     def _place_piece(self):
         ys = []
         for y, x in self._piece.get_blocks_coords():
@@ -35,28 +48,27 @@ class Grid:
                 idx -= 1
                 
 
-    def is_occupied(self, y: int, x: int) -> bool:
+    def _is_occupied(self, y: int, x: int) -> bool:
         return y < 0 \
             or y >= self._size_y \
             or x < 0 \
             or x >= self._size_x \
             or self._cells[y][x] != 0
-    
+
 
     def rotate_piece(self):
-        self._piece.rotate(self.is_occupied)
+        self._piece.rotate(self._is_occupied)
 
 
     def move_piece(self, direction: Tetromino.MoveDirection):
-        self._piece.move(direction, self.is_occupied)
+        self._piece.move(direction, self._is_occupied)
 
 
     def tick(self):
-        self._piece.tick(self.is_occupied)
+        self._piece.tick(self._is_occupied)
         if self._piece.placed:
             self._place_piece()
-            self._piece = self._piece_provider()
-            self._piece.spawn(0, self._size_x // 2)
+            self.__spawn_piece()
 
 
     def draw(self, y: int, x: int, block_height: int, block_width: int, window):

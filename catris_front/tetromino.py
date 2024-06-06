@@ -50,8 +50,12 @@ class Tetromino(ABC):
         return any(is_occupied(y, x) for y, x in self.get_blocks_coords())
 
 
-    def _can_move(self) -> bool:
-        return self._spawned and not self._placed
+    def spawn(self, y: int, x: int):
+        if self._spawned:
+            raise RuntimeError('Already spawned')
+        self._y = y
+        self._x = x
+        self._spawned = True
 
 
     def get_blocks_coords(self) -> Generator[tuple[int, int], None, None]:
@@ -61,20 +65,8 @@ class Tetromino(ABC):
                 if cell:
                     yield self._y + y, self._x + x
 
-
-    def spawn(self, y: int, x: int):
-        if self._spawned:
-            raise RuntimeError('Tetromino already spawned')
         
-        self._spawned = True
-        self._y = y
-        self._x = x
-
-
-    def rotate(self, is_occupied: CoordsPredicate):
-        if not self._can_move():
-            return
-        
+    def rotate(self, is_occupied: CoordsPredicate):        
         old_rotation = self._rotation
         self._rotation = self._get_next_rotation()
         if self._is_colliding(is_occupied):
@@ -82,9 +74,6 @@ class Tetromino(ABC):
 
 
     def move(self, direction: MoveDirection, is_occupied: CoordsPredicate) -> bool:
-        if not self._can_move():
-            return False
-        
         dy, dx = 0, 0    
         match direction:
             case Tetromino.MoveDirection.LEFT:
@@ -105,9 +94,6 @@ class Tetromino(ABC):
         
 
     def tick(self, is_occupied: CoordsPredicate):
-        if not self._can_move():
-            return
-        
         self._ticks_to_drop -= 1
         if self._ticks_to_drop == 0:
             self._ticks_to_drop = self._ticks_per_drop
