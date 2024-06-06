@@ -42,6 +42,7 @@ def main(stdscr):
     stdscr.clear()
     stdscr.refresh()
     stdscr.nodelay(True)
+    curses.start_color()
     curses.curs_set(0)
 
     # Create a windows as large as the screen
@@ -68,6 +69,7 @@ def main(stdscr):
         window.clear()
         draw_borders(window)
         game.draw(BLOCK_HEIGHT, BLOCK_WIDTH, window)
+        
         window.refresh()
 
 

@@ -1,6 +1,6 @@
 from grid import Grid
 from random import choice
-from tetromino import Tetromino
+from tetromino import Tetromino, TetrominoI, TetrominoJ, TetrominoL, TetrominoO, TetrominoS, TetrominoT, TetrominoZ
 import curses
 from collections.abc import Iterable
 
@@ -14,9 +14,15 @@ class Game:
 
 
     def _generate_piece(self) -> Tetromino:
-        kinds = ['O', 'I', 'S', 'Z', 'L', 'J', 'T']
-        return Tetromino(choice(kinds), 20)
-
+        return choice([
+            TetrominoI,
+            TetrominoJ,
+            TetrominoL,
+            TetrominoO,
+            TetrominoS,
+            TetrominoT,
+            TetrominoZ
+        ])(20)
 
     def _handle_key(self, key: int):
         match key:

@@ -5,18 +5,13 @@ import curses
 
 
 class Grid:
-    class State(Enum):
-        EMPTY = 0
-        FILLED = 1
-
-
     def __init__(self, size_y: int, size_x: int, piece_provider: Callable[[], Tetromino]):
         """
         Actual widget's size will be size_y + 2 x size_x + 2 to account for the borders.
         """
         self._size_y = size_y
         self._size_x = size_x
-        self._cells = [[Grid.State.EMPTY] * size_x for _ in range(size_y)]
+        self._cells = [[0] * size_x for _ in range(size_y)]
         self._piece_provider = piece_provider
         self._piece = piece_provider()
         # TODO: Fix spawning not being centered and clipping out of the grid.
@@ -26,16 +21,16 @@ class Grid:
     def _place_piece(self):
         ys = []
         for y, x in self._piece.get_blocks_coords():
-            self._cells[y][x] = Grid.State.FILLED
+            self._cells[y][x] = self._piece.color
             if y not in ys:
                 ys.append(y)
 
         # Collapse filled rows.
         idx = len(ys) - 1
         while idx >= 0:
-            if all(s == Grid.State.FILLED for s in self._cells[y]):
+            if all(s for s in self._cells[y]):
                 self._cells.pop(y)
-                self._cells.insert(0, [Grid.State.EMPTY] * self._size_x)
+                self._cells.insert(0, [0] * self._size_x)
             else:
                 idx -= 1
                 
@@ -45,7 +40,7 @@ class Grid:
             or y >= self._size_y \
             or x < 0 \
             or x >= self._size_x \
-            or self._cells[y][x] == Grid.State.FILLED
+            or self._cells[y][x] != 0
     
 
     def rotate_piece(self):
@@ -85,9 +80,11 @@ class Grid:
         # Draw filled cells.
         for grid_y, row in enumerate(self._cells):
             for grid_x, cell in enumerate(row):
-                if cell == Grid.State.FILLED:
+                if cell:
                     for block_y in range(block_height):
                         for block_x in range(block_width):
                             window.addch(y + grid_y*block_height + block_y + 1, 
-                                         x + grid_x*block_width + block_x + 1, '#')
+                                         x + grid_x*block_width + block_x + 1, 
+                                         '#', 
+                                         cell)
         
