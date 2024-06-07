@@ -33,9 +33,11 @@ class Grid:
 
     def _place_piece(self):
         ys = []
+        current_y = -1
         for y, x in self._piece.get_blocks_coords():
             self._cells[y][x] = self._piece.color
-            if y not in ys:
+            if current_y < y:
+                current_y = y
                 ys.append(y)
 
         # Collapse filled rows.
