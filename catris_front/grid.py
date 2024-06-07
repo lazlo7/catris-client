@@ -41,6 +41,7 @@ class Grid:
         # Collapse filled rows.
         idx = len(ys) - 1
         while idx >= 0:
+            y = ys[idx]
             if all(s for s in self._cells[y]):
                 self._cells.pop(y)
                 self._cells.insert(0, [0] * self._size_x)
