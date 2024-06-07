@@ -88,6 +88,8 @@ class Tetromino(ABC):
         if self._is_colliding(is_occupied):
             self._x -= dx
             self._y -= dy
+            if dy:
+                self._placed = True
             return False
         
         return True 
@@ -97,8 +99,7 @@ class Tetromino(ABC):
         self._ticks_to_drop -= 1
         if self._ticks_to_drop == 0:
             self._ticks_to_drop = self._ticks_per_drop
-            if not self.move(self.MoveDirection.DOWN, is_occupied):
-                self._placed = True
+            self.move(self.MoveDirection.DOWN, is_occupied)
 
     
     def draw(self, y: int, x: int, block_height: int, block_width: int, window):
